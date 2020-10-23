@@ -1,0 +1,83 @@
+﻿@model IEnumerable<FIT5032_Assignment_30533651.Models.BranchCourses>
+
+@{
+    ViewBag.Title = "CoursesByBranch";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var branch = ViewBag.branch;
+}
+
+<h2>CoursesByBranch</h2>
+
+<div class="row">
+    <div class="col-md-4">
+        <h2 id="coursesName"></h2>
+        <p id="coursesDesc"></p>
+        <h3 id="startTime"></h3>
+        <a id="bookLink"></a>
+    </div>
+    <div class="col-md-8" id="calendar"></div>
+</div>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Branches.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Courses.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.StartTime)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Branches.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Courses.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StartTime)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+            </td>
+        </tr>
+    }
+
+</table>
+
+@section scripts{
+    <script src="~/Scripts/Calendar.js"></script>
+    <script>
+        $(document).ready(function () {
+            var courses = [];
+            $.ajax({
+                type: "GET",
+                url: "/BranchCourses/GetCoursesByBranch/@branch.Id",
+                success: function (data) {
+                    $.each(data, function (i, v) {
+                        courses.push({
+                            coursesId: v.Id,
+                            title: v.Courses.Name,
+                            description: v.Courses.Description,
+                            start: moment(v.StartTime),
+                            color: v.Courses.Color
+                        })
+                    });
+                    generateCalendar(courses);
+                },
+                error: function (error) {
+                    alert("failed to get data");
+                }
+            })
+        })
+    </script>
+}
